@@ -14,7 +14,8 @@ builder.Services.Configure<Extensions.HttpClient.CatApiSettings>(
     builder.Configuration.GetSection("CatApiSettings"));
 
 builder.Services.AddDbContext<DatabaseContext.DBHelper.Methods.DbHelper>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+        x => x.MigrationsAssembly("StealTheCats")));
 
 builder.Services.AddHttpClient();
 builder.Services.AddCatsLibraryServices();

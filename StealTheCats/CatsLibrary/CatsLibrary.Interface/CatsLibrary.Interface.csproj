@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\DatabaseContext.DBHelper\DatabaseContext.DBHelper.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -24,10 +24,16 @@ namespace CatsLibrary.Controller
         }
 
         [HttpGet("/{id}")]
-        public async Task<IActionResult> GetCats()
+        public async Task<IActionResult> GetCats(int id)
         {
+            var catById = _catsInterface.GetCatById(id);
 
-            return Ok();
+            if (catById == null)
+            {
+                return NotFound(); 
+            }
+
+            return Ok(catById);
         }
     }
 

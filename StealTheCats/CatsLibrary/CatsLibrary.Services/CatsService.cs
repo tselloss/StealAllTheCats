@@ -1,8 +1,10 @@
 ﻿using CatsLibrary.Interface;
 using CatsLibrary.Interface.Models;
+using DatabaseContext.DBHelper.DTO;
 using DatabaseContext.DBHelper.Methods;
 using DatabaseContext.DBHelper.Models;
 using Extensions.HttpClient;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace CatsLibrary.Services
@@ -56,7 +58,7 @@ namespace CatsLibrary.Services
                             _dbHelper.Tags.Add(tag);
                         }
 
-                        
+
                         _dbHelper.CatTags.Add(new CatTag
                         {
                             Cat = newCat,
@@ -69,9 +71,28 @@ namespace CatsLibrary.Services
             }
         }
 
+        public Task<CatEntityDto> GetCatById(int id)
+        {
+            var cat = _dbHelper.Cats.FirstOrDefault(x => x.Id == id);
+
+            if (cat == null)
+            {
+                return null;
+            }
+
+            var returnCat = new CatEntityDto()
+            {                
+                Id = cat.Id,
+                Height = cat.Height,
+                Url = cat.Image,
+                Width = cat.Width
+            };
+
+            return Task.FromResult(returnCat);
+        }
 
         private List<string> NameTemperament(string temperament)
-        { 
+        {
             var spitTheTemperament = temperament.Split(',').ToList();
 
             return spitTheTemperament;

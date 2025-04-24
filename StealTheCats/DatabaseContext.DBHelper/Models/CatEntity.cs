@@ -13,10 +13,10 @@ namespace DatabaseContext.DBHelper.Models
         public string CatId { get; set; }
 
         [Required]
-        public string Width { get; set; }
+        public int Width { get; set; }
 
         [Required]
-        public string Height { get; set; }
+        public int Height { get; set; }
 
         [Required]
         public string Image { get; set; }

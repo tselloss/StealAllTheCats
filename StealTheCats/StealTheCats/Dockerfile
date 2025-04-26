@@ -5,12 +5,17 @@ USER app
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
-EXPOSE 1433
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["StealTheCats/StealTheCats.csproj", "StealTheCats/"]
+COPY ["CatsLibrary/CatsLibrary.Extensions/CatsLibrary.Extensions.csproj", "CatsLibrary/CatsLibrary.Extensions/"]
+COPY ["CatsLibrary/CatsLibrary.Controller/CatsLibrary.Controller.csproj", "CatsLibrary/CatsLibrary.Controller/"]
+COPY ["CatsLibrary/CatsLibrary.Interface/CatsLibrary.Interface.csproj", "CatsLibrary/CatsLibrary.Interface/"]
+COPY ["DatabaseContext.DBHelper/DatabaseContext.DBHelper.csproj", "DatabaseContext.DBHelper/"]
+COPY ["CatsLibrary/CatsLibrary.Services/CatsLibrary.Services.csproj", "CatsLibrary/CatsLibrary.Services/"]
+COPY ["Extensions.HttpClient/Extensions.HttpClient.csproj", "Extensions.HttpClient/"]
 RUN dotnet restore "./StealTheCats/StealTheCats.csproj"
 COPY . .
 WORKDIR "/src/StealTheCats"

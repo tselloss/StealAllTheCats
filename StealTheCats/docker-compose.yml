@@ -1,0 +1,33 @@
+version: '3.4'
+
+services:
+  stealthecatsdb:
+    container_name: steal-all-the-cat-db
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - "8002:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=password12345!
+    networks:
+      - steal-all-the-cats
+  stealthecats:
+    container_name: steal-all-the-cats
+    image: ${DOCKER_REGISTRY-}stealthecats
+    build:
+      context: .
+      dockerfile: StealTheCats/Dockerfile
+    ports:
+     - 8001:80
+    depends_on:
+     - stealthecatsdb
+    environment:
+     - DB_HOST=steal-all-the-cat-db
+     - DB_NAME=steal-all-the-cats
+     - DB_SA_PASSWORD=password12345!
+    networks:
+     - steal-all-the-cats
+networks:
+  steal-all-the-cats:
+     driver: bridge
+  

@@ -1,5 +1,8 @@
 ﻿using DatabaseContext.DBHelper.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DatabaseContext.DBHelper.Methods
 {
@@ -9,7 +12,10 @@ namespace DatabaseContext.DBHelper.Methods
         public DbSet<TagEntity> Tags { get; set; }
         public DbSet<CatTag> CatTags { get; set; }
 
-        public DbHelper(DbContextOptions<DbHelper> options) : base(options) { }
+        public DbHelper(DbContextOptions<DbHelper> options) : base(options) 
+        {
+
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

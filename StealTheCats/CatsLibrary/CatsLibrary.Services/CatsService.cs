@@ -4,7 +4,7 @@ using DatabaseContext.DBHelper.DTO;
 using DatabaseContext.DBHelper.Methods;
 using DatabaseContext.DBHelper.Models;
 using Extensions.HttpClient;
-using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Text.Json;
 
 namespace CatsLibrary.Services
@@ -45,7 +45,6 @@ namespace CatsLibrary.Services
                     };
                     _dbHelper.Cats.Add(newCat);
 
-
                     // Split the name with temperament values
                     var listOfTemperament = NameTemperament(cat.Tags[0].Name);
                     foreach (var temperament in listOfTemperament)
@@ -58,14 +57,12 @@ namespace CatsLibrary.Services
                             _dbHelper.Tags.Add(tag);
                         }
 
-
                         _dbHelper.CatTags.Add(new CatTag
                         {
                             Cat = newCat,
                             Tag = tag
                         });
                     }
-
                 }
                 await _dbHelper.SaveChangesAsync();
             }
@@ -77,11 +74,11 @@ namespace CatsLibrary.Services
 
             if (cat == null)
             {
-                return null;
+                return Task.FromResult<CatEntityDto>(new CatEntityDto { });
             }
 
-            var returnCat = new CatEntityDto()
-            {                
+            var returnCat = new CatEntityDto
+            {
                 Id = cat.Id,
                 Height = cat.Height,
                 Url = cat.Image,
@@ -89,6 +86,59 @@ namespace CatsLibrary.Services
             };
 
             return Task.FromResult(returnCat);
+        }
+
+        public IEnumerable<CatEntityDto> GetCatsByPages(int page, int pageSize)
+        {
+            var cats = _dbHelper.Cats
+                                 .Skip((page - 1) * pageSize)
+                                 .Take(pageSize)
+                                 .Select(cat => new CatEntityDto
+                                 {
+                                     Id = cat.Id,
+                                     Height = cat.Height,
+                                     Url = cat.Image,
+                                     Width = cat.Width
+                                 })
+                                 .ToList();
+
+            return cats;
+        }
+
+        public Task<IEnumerable<CatEntityDto>> GetCatsByPages(int page, int pageSize, string tag)
+        {
+            if (string.IsNullOrWhiteSpace(tag))
+                return Task.FromResult<IEnumerable<CatEntityDto>>(new List<CatEntityDto>());
+
+            // Make the tag with the correct format
+            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+            string normalizedTag = textInfo.ToTitleCase(tag.ToLower());
+
+            var getTag = _dbHelper.Tags.FirstOrDefault(x => x.Name == normalizedTag);
+
+            if (getTag == null)
+            {
+                return Task.FromResult<IEnumerable<CatEntityDto>>(new List<CatEntityDto>());
+            }
+
+            var catIds = _dbHelper.CatTags
+                          .Where(ct => ct.TagId == getTag.Id)
+                          .Select(ct => ct.CatId);
+
+            var cats = _dbHelper.Cats
+                          .Where(c => catIds.Contains(c.Id))
+                          .Skip((page - 1) * pageSize)
+                          .Take(pageSize)
+                          .Select(cat => new CatEntityDto
+                          {
+                              Id = cat.Id,
+                              Height = cat.Height,
+                              Url = cat.Image,
+                              Width = cat.Width
+                          })
+                          .ToList();
+
+            return Task.FromResult<IEnumerable<CatEntityDto>>(cats);
         }
 
         private List<string> NameTemperament(string temperament)
